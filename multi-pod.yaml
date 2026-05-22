@@ -8,3 +8,7 @@ spec:
       image: angira9/fitness-tracker:latest
       ports:
         - containerPort: 3000
+    - name: nginx-container
+      image: nginx
+      ports:
+        - containerPort: 80
