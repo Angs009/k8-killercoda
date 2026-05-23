@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-loadbalancer-deploy
+  labels:
+    app: fitness-loadbalancer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fitness-loadbalancer
+  template:
+    metadata:
+      labels:
+        app: fitness-loadbalancer
+    spec:
+      containers:
+        - name: fitness-tracker
+          image: angira9/fitness-tracker:latest
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-loadbalancer-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: fitness-loadbalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
