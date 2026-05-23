@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fitness-deployment
+  name: fitness-deploy
   labels:
     app: fitness
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: fitness
@@ -23,13 +23,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-service
+  name: fitness-service
 spec:
   selector:
-    app: web
-ports:
-  -protocol: TCP
+    app: fitness
+  ports:
+  - protocol: TCP
     port: 80
     targetPort: 3000
-type: ClusterIP
-
+  type: ClusterIP
