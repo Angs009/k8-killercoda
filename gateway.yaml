@@ -6,7 +6,7 @@ metadata:
   labels:
     app: fitness-tracker
 spec:
-  gatewayClassName: envoy-gateway
+  gatewayClassName: eg
   listeners:
     - name: http
       protocol: HTTP
