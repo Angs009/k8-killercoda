@@ -7,11 +7,11 @@ spec:
   parentRefs:
     - name: bug-gateway
   rules:
-    # FRONTEND (React UI)
+    # FITNESS TRACKER UI
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: frontend-service
+        - name: fitness-service
           port: 80
