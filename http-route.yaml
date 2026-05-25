@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bug-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: bug-gateway
+  rules:
+    # FRONTEND (React UI)
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend-service
+          port: 80
