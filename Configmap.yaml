@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: angira-configmap
+data:
+  DB_Host: Mongodb
+  DB_Port: "27017"
+  DB_User: admin
+  APP_name: fitness-tracker
+  APP_Port: "3000"
