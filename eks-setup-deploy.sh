@@ -2,7 +2,7 @@
 set -euo pipefail
 
 CLUSTER_NAME="${CLUSTER_NAME:-angira-fitness-cluster}"
-AWS_REGION="${AWS_REGION:-ap-south-2}"
+AWS_REGION="${AWS_REGION:-us-west-2}"
 NODEGROUP_NAME="${NODEGROUP_NAME:-angira-nodegroup}"
 NODE_TYPE="${NODE_TYPE:-t3.medium}"
 K8S_VERSION="${K8S_VERSION:-1.31}"
