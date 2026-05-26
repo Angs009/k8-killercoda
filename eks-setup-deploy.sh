@@ -7,6 +7,31 @@ NODEGROUP_NAME="${NODEGROUP_NAME:-angira-nodegroup}"
 NODE_TYPE="${NODE_TYPE:-t3.medium}"
 K8S_VERSION="${K8S_VERSION:-1.31}"
 
+print_cluster_failure_details() {
+  echo "Cluster creation failed. Recent CloudFormation failure events:"
+  stack_names="$(aws cloudformation list-stacks \
+    --region "$AWS_REGION" \
+    --stack-status-filter CREATE_FAILED ROLLBACK_IN_PROGRESS ROLLBACK_COMPLETE DELETE_FAILED \
+    --query "StackSummaries[?contains(StackName, 'eksctl-$CLUSTER_NAME')].StackName" \
+    --output text 2>/dev/null || true)"
+
+  if [ -z "$stack_names" ]; then
+    echo "No failed eksctl CloudFormation stacks were found for $CLUSTER_NAME."
+    echo "Open AWS CloudFormation in region $AWS_REGION and check stacks starting with eksctl-$CLUSTER_NAME."
+    return
+  fi
+
+  for stack_name in $stack_names; do
+    echo "Stack: $stack_name"
+    aws cloudformation describe-stack-events \
+      --region "$AWS_REGION" \
+      --stack-name "$stack_name" \
+      --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[Timestamp,LogicalResourceId,ResourceStatusReason]" \
+      --output table \
+      --max-items 20 || true
+  done
+}
+
 echo "Updating packages and installing prerequisites..."
 sudo apt update -y
 sudo apt install -y unzip curl tar gzip
@@ -51,7 +76,7 @@ aws sts get-caller-identity
 
 echo "Creating EKS cluster if it does not exist..."
 if ! eksctl get cluster --name "$CLUSTER_NAME" --region "$AWS_REGION" >/dev/null 2>&1; then
-  eksctl create cluster \
+  if ! eksctl create cluster \
     --name "$CLUSTER_NAME" \
     --version "$K8S_VERSION" \
     --region "$AWS_REGION" \
@@ -60,7 +85,10 @@ if ! eksctl get cluster --name "$CLUSTER_NAME" --region "$AWS_REGION" >/dev/null
     --nodes 2 \
     --nodes-min 2 \
     --nodes-max 3 \
-    --managed
+    --managed; then
+    print_cluster_failure_details
+    exit 1
+  fi
 else
   echo "Cluster $CLUSTER_NAME already exists."
 fi
