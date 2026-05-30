@@ -1,0 +1,131 @@
+1. Clone Repository
+cd /home/ubuntu
+
+git clone https://github.com/Angs009/Hospital-Management-Application.git
+
+cd Hospital-Management-Application
+2. Verify EKS Connectivity
+kubectl get nodes
+
+kubectl get pods -A
+
+Expected:
+
+STATUS = Ready
+3. Verify LoadBalancer Service
+kubectl apply -f k8s/configmap.yaml
+
+kubectl apply -f k8s/secret.yaml
+
+kubectl apply -f k8s/service.yaml
+4. Fix deployment.yaml
+
+Open:
+
+nano k8s/deployment.yaml
+
+Find:
+
+image: docker.io/nanineelapu/hospital-app:1.0.0
+
+Replace with:
+
+image: docker.io/angira9/hospital-app:1.0.0
+5. Fix MongoDB Storage
+
+Find:
+
+volumes:
+  - name: mongodb-data
+    persistentVolumeClaim:
+      claimName: hospital-mongodb-data
+
+Replace with:
+
+volumes:
+  - name: mongodb-data
+    emptyDir: {}
+
+Make sure indentation is exactly:
+
+      volumes:
+        - name: mongodb-data
+          emptyDir: {}
+6. Deploy Application
+kubectl apply -f k8s/deployment.yaml
+7. Verify Deployments
+kubectl get deployment
+
+Expected:
+
+hospital-web
+hospital-mongodb
+8. Verify Pods
+kubectl get pods -w
+
+Wait until:
+
+hospital-mongodb-xxxxx    1/1 Running
+
+hospital-web-xxxxx        1/1 Running
+
+hospital-web-xxxxx        1/1 Running
+9. Restart Web Deployment (if required)
+kubectl rollout restart deployment hospital-web
+10. Verify Services
+kubectl get svc
+
+Expected:
+
+hospital-web      LoadBalancer
+hospital-mongodb  ClusterIP
+11. Get Browser URL
+kubectl get svc hospital-web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+echo
+
+Or:
+
+echo "http://$(kubectl get svc hospital-web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+
+Example:
+
+http://xxxxxxxxxxxx.elb.eu-north-1.amazonaws.com
+12. Test URL
+curl http://$(kubectl get svc hospital-web -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+Open the same URL in your browser.
+
+13. Troubleshooting Commands
+
+Pods:
+
+kubectl get pods
+
+Web logs:
+
+kubectl logs -l app.kubernetes.io/component=web
+
+Mongo logs:
+
+kubectl logs -l app.kubernetes.io/component=mongodb
+
+Services:
+
+kubectl get svc
+
+Deployments:
+
+kubectl get deployment
+14. Delete Everything
+kubectl delete -f k8s/
+
+or
+
+kubectl delete deployment hospital-web hospital-mongodb
+
+kubectl delete service hospital-web hospital-mongodb
+
+One more recommendation: instead of modifying deployment.yaml manually every time, update the repository itself and commit the fixes (Docker image name and MongoDB volume configuration) so future deployments are a simple:
+
+git clone ...
+kubectl apply -f k8s/
