@@ -129,3 +129,4 @@ One more recommendation: instead of modifying deployment.yaml manually every tim
 
 git clone ...
 kubectl apply -f k8s/
+http://af08d6813c6964c4989ebc6e70176412-95f07f76d4959608.elb.eu-north-1.amazonaws.com
