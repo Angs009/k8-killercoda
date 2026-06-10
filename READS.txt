@@ -1,0 +1,12 @@
+Green register:
+aef69c170019245ebab4ac97955e77d5-1256749572.us-west-2.elb.amazonaws.com
+
+Blue freshmart:
+ http://aef69c170019245ebab4ac97955e77d5-1256749572.us-west-2.elb.amazonaws.com/login
+
+
+datadog Kubernetes nodes: 
+
+https://us5.datadoghq.com/dash/integration/Kubernetes%20Nodes%20Overview?fromUser=false&refresh_mode=sliding&from_ts=1781033933858&to_ts=1781037533858&live=true
+
+
