@@ -1,5 +1,1 @@
-sonarqube: http://54.245.181.102:9000/dashboard?id=maven-web-application
 
-Jenkins: http://18.237.180.89:8080/job/maven-cicd/
-
-Tomcat: http://35.163.101.236:8080/maven-web-application/
